@@ -1,0 +1,35 @@
+#version 410 core
+
+layout(location = 0) in vec3 vertexpos;
+layout(location = 1) in vec3 inst;
+
+uniform mainBlock
+{
+	mat4 projView;
+	vec2 res;
+	float ratio;
+	float time;
+	float time_end;
+	float intro;
+	float outro;
+	float bass;
+	float speed;
+}u;
+
+void	main()
+{
+	float scale = 1.1 - 0.5 * u.bass - inst.z * 0.04 - u.outro * 0.3;
+	mat2 rot = mat2(cos(inst.z * -.124), sin(inst.z * -.124),
+					-sin(inst.z * -.124), cos(inst.z * -.124));
+	mat2 rot_inst = mat2(cos(u.time_end * 0.3), sin(u.time_end * 0.3),
+					-sin(u.time_end * 0.3), cos(u.time_end * 0.3));
+	float z_outro = (max(abs(inst.x), abs(inst.y))) * (max(abs(inst.x), abs(inst.y))) * (0.001 + u.outro * 0.014);
+	vec3 inst_fft = vec3(rot_inst * (inst.xy * (1 + u.bass * 0.15 +
+						((1. - pow(min(u.intro + 0.015, 1.0), 0.2)) * 50.))),
+						inst.z * (1. - u.bass * 2.) - z_outro);
+
+	vec2 vtxpos_mod = rot * vec2(vertexpos.xy);
+	gl_Position = u.projView *
+	vec4(vtxpos_mod.xy * scale * max(0., u.intro) + inst_fft.xy,
+									vertexpos.z + inst_fft.z, 1.);
+}

@@ -1,0 +1,27 @@
+#version 410 core
+
+layout(location = 0) in vec3 vertexpos;
+out vec4 vtxColor;
+
+uniform mainBlock
+{
+	mat4 projView;
+	vec2 res;
+	float ratio;
+	float time;
+	float time_end;
+	float intro;
+	float outro;
+	float bass;
+	float speed;
+}u;
+
+void	main()
+{
+	float scale = 3.;
+	vec3 toWorld = vec3(48., -127., 0.);
+
+	vec3 pos = vec3(vertexpos.x + toWorld.x, vertexpos.yz * scale + toWorld.yz);
+	gl_Position = u.projView * vec4(pos, 1.);
+	vtxColor = vec4(0.0, 0.8, 0.0, 1.0);
+}
